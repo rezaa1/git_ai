@@ -1,1 +1,5 @@
- 
+flask
+openai
+PyGithub
+# Add any other dependencies your backend needs
+
