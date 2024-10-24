@@ -1,6 +1,7 @@
 class AITeam:
-    def __init__(self):
+    def __init__(self, github_manager):
         self.team_members = []
+        self.github_manager = github_manager
 
     def add_member(self, member):
         self.team_members.append(member)
