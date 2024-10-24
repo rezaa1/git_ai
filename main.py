@@ -5,77 +5,8 @@ from github import Github
 from github.Repository import Repository
 from github.Branch import Branch
 from github.PullRequest import PullRequest
-
-class AICharacter:
-    def __init__(self, name: str, expertise: List[str]):
-        self.name = name
-        self.expertise = expertise
-
-    def generate_code(self, prompt: str) -> str:
-        try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": f"You are an AI assistant with expertise in {', '.join(self.expertise)}. Generate code based on the given prompt."},
-                    {"role": "user", "content": prompt}
-                ]
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            print(f"Error generating code: {str(e)}")
-            return ""
-
-class GitHubManager:
-    def __init__(self, repo_name: str):
-        self.repo_name = repo_name
-        self.github = Github(os.getenv("GITHUB_TOKEN"))
-        self.repo: Repository = self.github.get_repo(self.repo_name)
-
-    def create_branch(self, branch_name: str):
-        try:
-            source = self.repo.get_branch("main")
-            self.repo.create_git_ref(ref=f"refs/heads/{branch_name}", sha=source.commit.sha)
-            print(f"Branch '{branch_name}' created successfully.")
-        except Exception as e:
-            print(f"Error creating branch: {str(e)}")
-
-    def commit_and_push(self, branch_name: str, file_path: str, content: str, commit_message: str):
-        try:
-            branch: Branch = self.repo.get_branch(branch_name)
-            current_file = self.repo.get_contents(file_path, ref=branch_name)
-            self.repo.update_file(file_path, commit_message, content, current_file.sha, branch=branch_name)
-            print(f"Changes committed and pushed to '{branch_name}'.")
-        except Exception as e:
-            print(f"Error committing and pushing changes: {str(e)}")
-
-    def create_pull_request(self, branch_name: str, title: str, description: str):
-        try:
-            pr: PullRequest = self.repo.create_pull(title=title, body=description, head=branch_name, base="main")
-            print(f"Pull request created: {pr.html_url}")
-            return pr
-        except Exception as e:
-            print(f"Error creating pull request: {str(e)}")
-            return None
-
-class CodebaseManager:
-    def __init__(self, repo_manager: GitHubManager):
-        self.repo_manager = repo_manager
-        self.codebase: Dict[str, str] = {}
-
-    def update_file(self, file_path: str, content: str):
-        self.codebase[file_path] = content
-        print(f"File '{file_path}' updated in the codebase.")
-
-    def get_file_content(self, file_path: str) -> str:
-        content = self.codebase.get(file_path, "")
-        if not content:
-            try:
-                github_content = self.repo_manager.repo.get_contents(file_path)
-                content = github_content.decoded_content.decode('utf-8')
-                self.codebase[file_path] = content
-            except Exception as e:
-                print(f"Error fetching file content: {str(e)}")
-        return content
+from src.ai_character import AICharacter
+from src.github_manager import GitHubManager
 
 class AITeam:
     def __init__(self, characters: List[AICharacter], github_manager: GitHubManager, codebase_manager: CodebaseManager):
@@ -130,4 +61,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
