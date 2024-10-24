@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:14 as build
 
 WORKDIR /app
 
@@ -6,20 +6,18 @@ WORKDIR /app
 COPY package*.json ./
 
 # Clear npm cache, remove node_modules, and install dependencies
-RUN npm cache clean --force && \
-    rm -rf node_modules && \
-    npm install
+RUN npm install
 
 # Copy the rest of the frontend code
 COPY . .
 
-# Rebuild node-sass
-RUN npm rebuild node-sass
-
 # Build the React app
 RUN npm run build
 
-# Serve the app using a lightweight server
-RUN npm install -g serve
+FROM nginx:alpine
 
-CMD ["serve", "-s", "build", "-l", "3000"]
+COPY --from=build /app/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
