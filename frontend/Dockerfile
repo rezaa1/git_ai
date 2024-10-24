@@ -1,21 +1,14 @@
-FROM node:14 as build
+FROM node:14
 
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the frontend code
 COPY . .
 
-# Build the React app
-RUN npm run build
+# Copy .env file
+COPY .env .
 
-# Production environment
-FROM nginx:alpine
-COPY --from=build /app/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Start the app
+CMD ["npm", "start"]
