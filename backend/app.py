@@ -7,8 +7,12 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-ai_team = AITeam()  # Create an instance of AITeam
-github_manager = GitHubManager("", os.getenv("GITHUB_TOKEN"))
+github_token = os.getenv("GITHUB_TOKEN")
+if not github_token:
+    raise ValueError("GITHUB_TOKEN environment variable is not set")
+
+github_manager = GitHubManager("", github_token)
+ai_team = AITeam(github_manager)
 
 @app.route('/generate-code', methods=['POST'])
 def generate_code():

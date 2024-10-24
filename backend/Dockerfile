@@ -14,5 +14,8 @@ COPY . .
 # Set Python path
 ENV PYTHONPATH=/app
 
+# Set GITHUB_TOKEN environment variable
+ENV GITHUB_TOKEN=your_github_token_here
+
 # Command to run the application
 CMD ["python", "-m", "app"]

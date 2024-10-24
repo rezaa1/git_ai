@@ -3,9 +3,11 @@ from typing import List
 
 class GitHubManager:
     def __init__(self, repo_name: str, access_token: str):
+        if not access_token:
+            raise ValueError("GitHub access token is required")
         self.repo_name = repo_name
         self.github = Github(access_token)
-        self.repo = self.github.get_repo(repo_name)
+        self.repo = self.github.get_repo(repo_name) if repo_name else None
 
     def create_branch(self, branch_name: str):
         source_branch = self.repo.get_branch("main")

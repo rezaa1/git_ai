@@ -1,5 +1,5 @@
 flask
 flask-cors
-openai
 PyGithub
 # Add any other dependencies your backend needs
+
