@@ -1,16 +1,13 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from .src.ai_team import AITeam  # Use relative import
+from src.ai_team import AITeam  # Make sure this import works
 from src.github_manager import GitHubManager
 import os
 
 app = Flask(__name__)
 CORS(app)
 
-ai_team = AITeam("CodeCrew", [
-    AICharacter("PythonExpert", ["Python", "Data Structures"], os.getenv("OPENAI_API_KEY")),
-    AICharacter("WebDev", ["JavaScript", "HTML", "CSS"], os.getenv("OPENAI_API_KEY"))
-])
+ai_team = AITeam()  # Create an instance of AITeam
 github_manager = GitHubManager("", os.getenv("GITHUB_TOKEN"))
 
 @app.route('/generate-code', methods=['POST'])
@@ -37,6 +34,21 @@ def create_pull_request():
 @app.route('/team-expertise', methods=['GET'])
 def get_team_expertise():
     return jsonify({"expertise": ai_team.get_team_expertise()})
+
+@app.route('/team_size', methods=['GET'])
+def get_team_size():
+    size = ai_team.get_team_size()
+    return jsonify({"team_size": size})
+
+@app.route('/add_member', methods=['POST'])
+def add_team_member():
+    data = request.json
+    member_name = data.get('name')
+    if member_name:
+        ai_team.add_member(member_name)
+        return jsonify({"message": f"Added {member_name} to the team"}), 201
+    else:
+        return jsonify({"error": "Member name is required"}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
