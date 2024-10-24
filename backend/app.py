@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from src.ai_team import AITeam
+from .src.ai_team import AITeam  # Use relative import
 from src.github_manager import GitHubManager
 import os
 
